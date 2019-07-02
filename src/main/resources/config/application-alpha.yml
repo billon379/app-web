@@ -1,0 +1,78 @@
+server:
+  port: 8080
+
+#eureka服务提供方(provider)配置
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:8000/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${spring.application.name}:${server.port} # 将instance-id设置成ip:端口的形式
+
+#开启hystrix断路器
+feign:
+  hystrix:
+    enabled: true
+#设置读取超时时间
+ribbon.ReadTimeout: 5000
+hystrix:
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: false
+  threadpool:
+    default:
+      #并发执行的最大线程数,默认10
+      coreSize: 400
+
+#spring配置
+spring:
+  application:
+    name: app-web #服务名称，在eureka注册中心显示
+  zipkin:
+    sender:
+      type: rabbit
+  sleuth:
+    sampler:
+      percentage: 1.0 #采样率
+
+  #redis配置
+  redis:
+    host: redis
+    port: 6379
+    password: billon
+    lettuce:
+      pool:
+        max-active: 1024
+        max-idle: 200
+
+  #rabbitmq配置
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: billon
+    password: billon
+
+#暴露actuator相关endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,loggers
+
+########自定义配置项########
+billon:
+  app-web:
+    sid: 597fd6f8c448098b196e72fd54846c5b #内部服务id
+  advice:
+    token:
+      enabled: true
+      excludedUris:
+        - '/auth/token/refresh'
+
+#日志级别
+logging:
+  level:
+    root: debug
